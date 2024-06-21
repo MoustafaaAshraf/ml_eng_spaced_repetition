@@ -27,27 +27,34 @@ jobs:
 
     - name: Deploy Cloud Function
       run: |
-        gcloud functions deploy ${{ secrets.FUNCTION_NAME }} \
+        gcloud functions deploy ${{ env.FUNCTION_NAME }} \
           --runtime python39 \
-          --trigger-topic ${{ secrets.TOPIC_NAME }} \
+          --trigger-topic ${{ env.TOPIC_NAME }} \
           --set-env-vars SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }} \
-          --region ${{ env.REGION }}
+          --region=${{ env.REGION }}
 
     - name: Set up Cloud Scheduler
       run: |
         # Check if the scheduler job already exists
-        if gcloud scheduler jobs describe ${{ secrets.SCHEDULER_JOB_NAME }} --location ${{ env.REGION }}; then
+        if gcloud scheduler jobs describe ${{ env.SCHEDULER_JOB_NAME }} --location=${{ env.REGION }}; then
           # Update existing job
-          gcloud scheduler jobs update pubsub ${{ secrets.SCHEDULER_JOB_NAME }} \
+          gcloud scheduler jobs update pubsub ${{ env.SCHEDULER_JOB_NAME }} \
             --schedule "0 8 * * *" \
-            --topic ${{ secrets.TOPIC_NAME }} \
+            --topic ${{ env.TOPIC_NAME }} \
             --message-body "It's time for daily topic!" \
-            --location ${{ env.REGION }}
+            --location=${{ env.REGION }}
         else
           # Create new job
-          gcloud scheduler jobs create pubsub ${{ secrets.SCHEDULER_JOB_NAME }} \
+          gcloud scheduler jobs create pubsub ${{ env.SCHEDULER_JOB_NAME }} \
             --schedule "0 8 * * *" \
-            --topic ${{ secrets.TOPIC_NAME }} \
+            --topic ${{ env.TOPIC_NAME }} \
             --message-body "It's time for daily topic!" \
-            --location ${{ env.REGION }}
+            --location=${{ env.REGION }}
         fi
+
+    - name: Debug Information
+      run: |
+        echo "Function Name: ${{ env.FUNCTION_NAME }}"
+        echo "Region: ${{ env.REGION }}"
+        echo "Topic Name: ${{ env.TOPIC_NAME }}"
+        echo "Scheduler Job Name: ${{ env.SCHEDULER_JOB_NAME }}"
