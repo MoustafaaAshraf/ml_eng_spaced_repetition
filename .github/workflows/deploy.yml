@@ -31,23 +31,23 @@ jobs:
           --runtime python39 \
           --trigger-topic ${{ secrets.TOPIC_NAME }} \
           --set-env-vars SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }} \
-          --region ${{ secrets.REGION }}
+          --region ${{ env.REGION }}
 
     - name: Set up Cloud Scheduler
       run: |
         # Check if the scheduler job already exists
-        if gcloud scheduler jobs describe ${{ secrets.SCHEDULER_JOB_NAME }} --location ${{ secrets.REGION }}; then
+        if gcloud scheduler jobs describe ${{ secrets.SCHEDULER_JOB_NAME }} --location ${{ env.REGION }}; then
           # Update existing job
           gcloud scheduler jobs update pubsub ${{ secrets.SCHEDULER_JOB_NAME }} \
             --schedule "0 8 * * *" \
             --topic ${{ secrets.TOPIC_NAME }} \
             --message-body "It's time for daily topic!" \
-            --location ${{ secrets.REGION }}
+            --location ${{ env.REGION }}
         else
           # Create new job
           gcloud scheduler jobs create pubsub ${{ secrets.SCHEDULER_JOB_NAME }} \
             --schedule "0 8 * * *" \
             --topic ${{ secrets.TOPIC_NAME }} \
             --message-body "It's time for daily topic!" \
-            --location ${{ secrets.REGION }}
+            --location ${{ env.REGION }}
         fi
