@@ -105,13 +105,3 @@ Contributions to improve the project are welcome. Please follow these steps:
 3. Commit your changes
 4. Push to your branch
 5. Create a new Pull Request
-
-## License
-
-[Specify your license here, e.g., MIT License]
-
-## Contact
-
-[Your Name or GitHub username]
-
-[Optional: Your email or other contact information]
